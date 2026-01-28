@@ -27,9 +27,8 @@ public class Resource {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private ResourceCategory category;
+    @Column(nullable = false)
+    private String category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "servicer_id", nullable = false)

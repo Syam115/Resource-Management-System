@@ -1,7 +1,6 @@
 package com.resourcemanagement.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +17,8 @@ public class ResourceRequest {
     
     private String description;
     
-    @NotNull(message = "Category ID is required")
-    private Long categoryId;
+    @NotBlank(message = "Category is required")
+    private String category;
     
     private String location;
     

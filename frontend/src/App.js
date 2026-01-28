@@ -14,7 +14,6 @@ import MyBookings from './pages/user/MyBookings';
 
 // Servicer Pages
 import Dashboard from './pages/servicer/Dashboard';
-import Categories from './pages/servicer/Categories';
 import Resources from './pages/servicer/Resources';
 import Bookings from './pages/servicer/Bookings';
 
@@ -86,14 +85,6 @@ function AppContent() {
             element={
               <ProtectedRoute requiredRole="SERVICER">
                 <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/servicer/categories"
-            element={
-              <ProtectedRoute requiredRole="SERVICER">
-                <Categories />
               </ProtectedRoute>
             }
           />

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { categoryService } from '../../services/categoryService';
 import { resourceService } from '../../services/resourceService';
 import { bookingService } from '../../services/bookingService';
 
@@ -19,14 +18,18 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const [categoriesRes, resourcesRes, bookingsRes] = await Promise.all([
-        categoryService.getMyCategories(),
+      const [resourcesRes, bookingsRes] = await Promise.all([
         resourceService.getMyResources(),
         bookingService.getBookingRequests(),
       ]);
 
+      // Calculate unique categories from resources
+      const uniqueCategories = resourcesRes.success 
+        ? [...new Set(resourcesRes.data.map(r => r.category))].length
+        : 0;
+
       setStats({
-        categories: categoriesRes.success ? categoriesRes.data.length : 0,
+        categories: uniqueCategories,
         resources: resourcesRes.success ? resourcesRes.data.length : 0,
         pendingBookings: bookingsRes.success 
           ? bookingsRes.data.filter(b => b.status === 'PENDING').length 
@@ -57,9 +60,7 @@ const Dashboard = () => {
         <div className="card bg-blue-50">
           <h3 className="text-gray-600 text-sm">Categories</h3>
           <p className="text-3xl font-bold text-blue-600">{stats.categories}</p>
-          <Link to="/servicer/categories" className="text-blue-600 text-sm hover:underline">
-            Manage →
-          </Link>
+          <p className="text-blue-600 text-xs">Unique categories</p>
         </div>
 
         <div className="card bg-green-50">
@@ -91,9 +92,6 @@ const Dashboard = () => {
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="flex flex-wrap gap-4">
-          <Link to="/servicer/categories" className="btn-primary">
-            + Add Category
-          </Link>
           <Link to="/servicer/resources" className="btn-primary">
             + Add Resource
           </Link>

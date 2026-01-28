@@ -10,3 +10,14 @@ package-lock.json
 # ===== IDE =====
 .idea/
 .vscode/
+
+# Backend build
+backend/target/
+
+# Frontend
+node_modules/
+dist/
+
+# IDE
+.idea/
+.vscode/

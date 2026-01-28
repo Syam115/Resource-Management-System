@@ -18,11 +18,11 @@ public class ResourceController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<ResourceResponse>>> getAllResources(
-            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String category,
             @RequestParam(required = false) String search) {
         List<ResourceResponse> resources;
-        if (categoryId != null || search != null) {
-            resources = resourceService.searchResources(categoryId, search);
+        if (category != null || search != null) {
+            resources = resourceService.searchResources(category, search);
         } else {
             resources = resourceService.getAvailableResources();
         }
@@ -39,9 +39,9 @@ public class ResourceController {
         }
     }
 
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<ApiResponse<List<ResourceResponse>>> getResourcesByCategory(@PathVariable Long categoryId) {
-        List<ResourceResponse> resources = resourceService.getResourcesByCategory(categoryId);
+    @GetMapping("/category/{category}")
+    public ResponseEntity<ApiResponse<List<ResourceResponse>>> getResourcesByCategory(@PathVariable String category) {
+        List<ResourceResponse> resources = resourceService.getResourcesByCategory(category);
         return ResponseEntity.ok(ApiResponse.success(resources));
     }
 }
