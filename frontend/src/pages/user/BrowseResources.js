@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { resourceService } from '../../services/resourceService';
-import { categoryService } from '../../services/categoryService';
 import BookingModal from '../../components/BookingModal';
 
 const BrowseResources = () => {
@@ -13,20 +12,8 @@ const BrowseResources = () => {
   const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
-    fetchCategories();
     fetchResources();
   }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await categoryService.getAllCategories();
-      if (response.success) {
-        setCategories(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
 
   const fetchResources = async () => {
     setLoading(true);
@@ -37,6 +24,9 @@ const BrowseResources = () => {
       );
       if (response.success) {
         setResources(response.data);
+        // Extract unique categories from resources
+        const uniqueCategories = [...new Set(response.data.map(r => r.category))].sort();
+        setCategories(uniqueCategories);
       }
     } catch (error) {
       console.error('Error fetching resources:', error);
@@ -79,8 +69,8 @@ const BrowseResources = () => {
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
+                <option key={cat} value={cat}>
+                  {cat}
                 </option>
               ))}
             </select>
@@ -116,7 +106,7 @@ const BrowseResources = () => {
               </div>
               <p className="text-gray-600 text-sm mb-3">{resource.description}</p>
               <div className="text-sm text-gray-500 space-y-1">
-                <p><span className="font-medium">Category:</span> {resource.categoryName}</p>
+                <p><span className="font-medium">Category:</span> {resource.category}</p>
                 <p><span className="font-medium">Location:</span> {resource.location || 'N/A'}</p>
                 <p><span className="font-medium">Capacity:</span> {resource.capacity || 'N/A'}</p>
                 <p><span className="font-medium">Provider:</span> {resource.servicerName}</p>

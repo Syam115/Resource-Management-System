@@ -3,9 +3,7 @@ package com.resourcemanagement.service;
 import com.resourcemanagement.dto.ResourceRequest;
 import com.resourcemanagement.dto.ResourceResponse;
 import com.resourcemanagement.model.Resource;
-import com.resourcemanagement.model.ResourceCategory;
 import com.resourcemanagement.model.User;
-import com.resourcemanagement.repository.ResourceCategoryRepository;
 import com.resourcemanagement.repository.ResourceRepository;
 import com.resourcemanagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,6 @@ import java.util.stream.Collectors;
 public class ResourceService {
 
     private final ResourceRepository resourceRepository;
-    private final ResourceCategoryRepository categoryRepository;
     private final UserRepository userRepository;
 
     public List<ResourceResponse> getAllResources() {
@@ -35,8 +32,8 @@ public class ResourceService {
                 .collect(Collectors.toList());
     }
 
-    public List<ResourceResponse> searchResources(Long categoryId, String search) {
-        return resourceRepository.searchResources(categoryId, search).stream()
+    public List<ResourceResponse> searchResources(String category, String search) {
+        return resourceRepository.searchResources(category, search).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -47,8 +44,8 @@ public class ResourceService {
                 .collect(Collectors.toList());
     }
 
-    public List<ResourceResponse> getResourcesByCategory(Long categoryId) {
-        return resourceRepository.findByCategoryId(categoryId).stream()
+    public List<ResourceResponse> getResourcesByCategory(String category) {
+        return resourceRepository.findByCategory(category).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -64,17 +61,10 @@ public class ResourceService {
         User servicer = userRepository.findById(servicerId)
                 .orElseThrow(() -> new RuntimeException("Servicer not found"));
 
-        ResourceCategory category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-
-        if (!category.getServicer().getId().equals(servicerId)) {
-            throw new RuntimeException("You can only add resources to your own categories");
-        }
-
         Resource resource = Resource.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .category(category)
+                .category(request.getCategory())
                 .servicer(servicer)
                 .location(request.getLocation())
                 .capacity(request.getCapacity())
@@ -94,17 +84,9 @@ public class ResourceService {
             throw new RuntimeException("You can only update your own resources");
         }
 
-        if (request.getCategoryId() != null && !request.getCategoryId().equals(resource.getCategory().getId())) {
-            ResourceCategory category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            if (!category.getServicer().getId().equals(servicerId)) {
-                throw new RuntimeException("You can only use your own categories");
-            }
-            resource.setCategory(category);
-        }
-
         resource.setName(request.getName());
         resource.setDescription(request.getDescription());
+        resource.setCategory(request.getCategory());
         resource.setLocation(request.getLocation());
         resource.setCapacity(request.getCapacity());
         if (request.getIsAvailable() != null) {
@@ -127,13 +109,16 @@ public class ResourceService {
         resourceRepository.delete(resource);
     }
 
+    public List<String> getAllCategories() {
+        return resourceRepository.findDistinctCategories();
+    }
+
     private ResourceResponse mapToResponse(Resource resource) {
         return ResourceResponse.builder()
                 .id(resource.getId())
                 .name(resource.getName())
                 .description(resource.getDescription())
-                .categoryId(resource.getCategory().getId())
-                .categoryName(resource.getCategory().getName())
+                .category(resource.getCategory())
                 .servicerId(resource.getServicer().getId())
                 .servicerName(resource.getServicer().getName())
                 .location(resource.getLocation())

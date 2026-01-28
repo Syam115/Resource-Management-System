@@ -2,9 +2,9 @@ import api from './api';
 
 export const resourceService = {
   // Public endpoints
-  getAllResources: async (categoryId, search) => {
+  getAllResources: async (category, search) => {
     const params = new URLSearchParams();
-    if (categoryId) params.append('categoryId', categoryId);
+    if (category) params.append('category', category);
     if (search) params.append('search', search);
     const response = await api.get(`/resources?${params.toString()}`);
     return response.data;
@@ -15,8 +15,8 @@ export const resourceService = {
     return response.data;
   },
 
-  getResourcesByCategory: async (categoryId) => {
-    const response = await api.get(`/resources/category/${categoryId}`);
+  getResourcesByCategory: async (category) => {
+    const response = await api.get(`/resources/category/${category}`);
     return response.data;
   },
 

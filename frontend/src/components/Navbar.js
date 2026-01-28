@@ -27,9 +27,6 @@ const Navbar = () => {
                     <Link to="/servicer/dashboard" className="hover:text-primary-200">
                       Dashboard
                     </Link>
-                    <Link to="/servicer/categories" className="hover:text-primary-200">
-                      Categories
-                    </Link>
                     <Link to="/servicer/resources" className="hover:text-primary-200">
                       Resources
                     </Link>

@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { resourceService } from '../../services/resourceService';
-import { categoryService } from '../../services/categoryService';
 
 const Resources = () => {
   const [resources, setResources] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    categoryId: '',
+    category: '',
     location: '',
     capacity: '',
     isAvailable: true,
@@ -24,13 +22,8 @@ const Resources = () => {
 
   const fetchData = async () => {
     try {
-      const [resourcesRes, categoriesRes] = await Promise.all([
-        resourceService.getMyResources(),
-        categoryService.getMyCategories(),
-      ]);
-
+      const resourcesRes = await resourceService.getMyResources();
       if (resourcesRes.success) setResources(resourcesRes.data);
-      if (categoriesRes.success) setCategories(categoriesRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -44,7 +37,6 @@ const Resources = () => {
 
     const payload = {
       ...formData,
-      categoryId: parseInt(formData.categoryId),
       capacity: formData.capacity ? parseInt(formData.capacity) : null,
     };
 
@@ -72,7 +64,7 @@ const Resources = () => {
     setFormData({
       name: resource.name,
       description: resource.description || '',
-      categoryId: resource.categoryId.toString(),
+      category: resource.category || '',
       location: resource.location || '',
       capacity: resource.capacity?.toString() || '',
       isAvailable: resource.isAvailable,
@@ -99,7 +91,7 @@ const Resources = () => {
     setFormData({
       name: '',
       description: '',
-      categoryId: '',
+      category: '',
       location: '',
       capacity: '',
       isAvailable: true,
@@ -122,17 +114,10 @@ const Resources = () => {
         <button 
           onClick={() => setShowForm(true)} 
           className="btn-primary"
-          disabled={categories.length === 0}
         >
           + Add Resource
         </button>
       </div>
-
-      {categories.length === 0 && (
-        <div className="bg-yellow-100 text-yellow-800 p-4 rounded mb-6">
-          Please create a category first before adding resources.
-        </div>
-      )}
 
       {/* Form Modal */}
       {showForm && (
@@ -164,19 +149,14 @@ const Resources = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Category *
                 </label>
-                <select
-                  value={formData.categoryId}
-                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                <input
+                  type="text"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="input-field"
+                  placeholder="e.g., Meeting Rooms, Equipment, Vehicles"
                   required
-                >
-                  <option value="">Select Category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div>
@@ -265,7 +245,7 @@ const Resources = () => {
               </div>
               <p className="text-gray-600 text-sm">{resource.description}</p>
               <div className="text-sm text-gray-500 mt-2 space-y-1">
-                <p><span className="font-medium">Category:</span> {resource.categoryName}</p>
+                <p><span className="font-medium">Category:</span> {resource.category}</p>
                 <p><span className="font-medium">Location:</span> {resource.location || 'N/A'}</p>
                 <p><span className="font-medium">Capacity:</span> {resource.capacity || 'N/A'}</p>
               </div>

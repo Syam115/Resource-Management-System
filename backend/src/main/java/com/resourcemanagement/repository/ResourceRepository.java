@@ -13,12 +13,15 @@ import java.util.List;
 public interface ResourceRepository extends JpaRepository<Resource, Long> {
     List<Resource> findByServicer(User servicer);
     List<Resource> findByServicerId(Long servicerId);
-    List<Resource> findByCategoryId(Long categoryId);
+    List<Resource> findByCategory(String category);
     List<Resource> findByIsAvailableTrue();
     
     @Query("SELECT r FROM Resource r WHERE r.isAvailable = true " +
-           "AND (:categoryId IS NULL OR r.category.id = :categoryId) " +
+           "AND (:category IS NULL OR r.category = :category) " +
            "AND (:search IS NULL OR LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
            "OR LOWER(r.description) LIKE LOWER(CONCAT('%', :search, '%')))")
-    List<Resource> searchResources(@Param("categoryId") Long categoryId, @Param("search") String search);
+    List<Resource> searchResources(@Param("category") String category, @Param("search") String search);
+    
+    @Query("SELECT DISTINCT r.category FROM Resource r ORDER BY r.category")
+    List<String> findDistinctCategories();
 }

@@ -3,7 +3,6 @@ package com.resourcemanagement.controller;
 import com.resourcemanagement.dto.*;
 import com.resourcemanagement.model.User;
 import com.resourcemanagement.service.BookingService;
-import com.resourcemanagement.service.CategoryService;
 import com.resourcemanagement.service.ResourceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,54 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ServicerController {
 
-    private final CategoryService categoryService;
     private final ResourceService resourceService;
     private final BookingService bookingService;
-
-    // ==================== Category Endpoints ====================
-
-    @GetMapping("/categories")
-    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getMyCategories(@AuthenticationPrincipal User user) {
-        List<CategoryResponse> categories = categoryService.getCategoriesByServicer(user.getId());
-        return ResponseEntity.ok(ApiResponse.success(categories));
-    }
-
-    @PostMapping("/categories")
-    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(
-            @Valid @RequestBody CategoryRequest request,
-            @AuthenticationPrincipal User user) {
-        try {
-            CategoryResponse category = categoryService.createCategory(request, user.getId());
-            return ResponseEntity.ok(ApiResponse.success("Category created successfully", category));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
-        }
-    }
-
-    @PutMapping("/categories/{id}")
-    public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
-            @PathVariable Long id,
-            @Valid @RequestBody CategoryRequest request,
-            @AuthenticationPrincipal User user) {
-        try {
-            CategoryResponse category = categoryService.updateCategory(id, request, user.getId());
-            return ResponseEntity.ok(ApiResponse.success("Category updated successfully", category));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
-        }
-    }
-
-    @DeleteMapping("/categories/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteCategory(
-            @PathVariable Long id,
-            @AuthenticationPrincipal User user) {
-        try {
-            categoryService.deleteCategory(id, user.getId());
-            return ResponseEntity.ok(ApiResponse.success("Category deleted successfully", null));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
-        }
-    }
 
     // ==================== Resource Endpoints ====================
 
